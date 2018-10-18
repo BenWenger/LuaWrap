@@ -12,6 +12,7 @@
 #include <functional>
 
 #include "luaobject.h"
+#include "luastacksaver.h"
 
 namespace luawrap
 {

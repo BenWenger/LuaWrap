@@ -23,12 +23,18 @@
     <ClInclude Include="..\src\luafunction.h">
       <Filter>private</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\luastacksaver.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\luawrap.cpp">
       <Filter>private</Filter>
     </ClCompile>
     <ClCompile Include="..\src\luaobject.cpp">
+      <Filter>private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\luastacksaver.cpp">
       <Filter>private</Filter>
     </ClCompile>
   </ItemGroup>

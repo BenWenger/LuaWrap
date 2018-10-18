@@ -10,6 +10,7 @@ namespace luawrap
 
     void LuaObject::buildMetatable(Lua& lua)
     {
+        LuaStackSaver stk(lua);
                                                         // Bottom  ---->    Top
                                                         // obj                   <-  upon entry
         lua_createtable(lua, 0, 1);                     // obj, table

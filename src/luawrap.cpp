@@ -45,7 +45,8 @@ namespace luawrap
 
     std::string Lua::toString(int idx, bool loopsafe)
     {
-        // TODO - preserve stack
+        LuaStackSaver stk(*this);
+
         if(loopsafe)
         {
             lua_pushvalue(L, idx);
