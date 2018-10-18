@@ -9,6 +9,7 @@
 #include <lualib.h>
 #include <lauxlib.h>
 #include <type_traits>
+#include <functional>
 
 #include "luaobject.h"
 
@@ -17,6 +18,7 @@ namespace luawrap
     class Lua
     {
     public:
+        typedef std::function<int(Lua&)>    func_t;
 
         LUAWRAP_API                 Lua();
         LUAWRAP_API                 ~Lua();
@@ -29,11 +31,17 @@ namespace luawrap
 
         LUAWRAP_API operator        lua_State* ()   { return L;     }
 
+        LUAWRAP_API void            pushFunction(const func_t& func);
+
         template <typename UserType, typename... Args>
         UserType*           pushNewUserData(Args&&... args);
 
+        template <typename UserType>
+        UserType*           toUserData(int idx, const char* failMessage = nullptr);
+
     private:
         lua_State*                  L;
+        static int                  funcCallback(lua_State* L);
     };
 
 
@@ -52,6 +60,26 @@ namespace luawrap
         LuaObject* baseobj = static_cast<LuaObject*>(obj);
         baseobj->buildMetatable(*this);
         return obj;
+    }
+
+    
+    template <typename UserType>
+    UserType* Lua::toUserData(int idx, const char* failMessage)
+    {
+        if(failMessage)
+        {
+            auto res = toUserData<UserType>(idx, nullptr);
+            if(res)     return res;
+            else        throw std::runtime_error(failMessage);
+        }
+
+        if(lua_type(L, idx) != LUA_TUSERDATA)
+            return nullptr;
+        LuaObject* baseptr = reinterpret_cast<LuaObject*>(lua_touserdata(L, idx));
+        if(!baseptr)
+            return nullptr;
+
+        return dynamic_cast<UserType*>(baseptr);
     }
 }
 

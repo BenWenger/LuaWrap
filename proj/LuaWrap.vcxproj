@@ -146,6 +146,7 @@
     <ClInclude Include="..\include\luaobject.h" />
     <ClInclude Include="..\include\luawrap.h" />
     <ClInclude Include="..\include\luawrap_config.h" />
+    <ClInclude Include="..\src\luafunction.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\luaobject.cpp" />

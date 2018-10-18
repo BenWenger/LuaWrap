@@ -22,14 +22,24 @@ public:
     }
 };
 
+int callme(Lua& lua, int val)
+{
+    cout << "callme called with value:  " << val << '\n';
+    cout << "and lua param:  " << lua.toString(1,false) << '\n';
+    return 0;
+}
+
 int main()
 {
     {
         Lua lua;
-        lua.pushNewUserData<Temp>("This is a test");
+        lua.pushNewUserData<Temp>("Barfing");
 
-        cout << "whaaaaat" << endl;
-        cout << (lua_State*)lua << endl;
+        lua.pushFunction( std::bind(&callme, std::placeholders::_1, 5) );
+        lua_setglobal(lua, "callme");
+
+        luaL_loadstring(lua, "callme(\"This is a test\")");
+        lua_call(lua, 0, 0);
     }
 
     char c;
