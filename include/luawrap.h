@@ -3,10 +3,14 @@
 
 #include "luawrap_config.h"
 
+#include <stdexcept>
 #include <string>
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#include <type_traits>
+
+#include "luaobject.h"
 
 namespace luawrap
 {
@@ -25,9 +29,30 @@ namespace luawrap
 
         LUAWRAP_API operator        lua_State* ()   { return L;     }
 
+        template <typename UserType, typename... Args>
+        UserType*           pushNewUserData(Args&&... args);
+
     private:
         lua_State*                  L;
     };
+
+
+    //////////////////////////////////////
+    //  Inline functions
+    
+    template <typename UserType, typename... Args>
+    UserType* Lua::pushNewUserData(Args&&... args)
+    {
+        static_assert(std::is_base_of<LuaObject, UserType>::value, "Lua::pushNewUserData must produce a type derived from LuaObject");
+
+        void* buffer = lua_newuserdata(L, sizeof(UserType));
+        if(!buffer)     throw std::bad_alloc();
+
+        UserType* obj = new(buffer) UserType(std::forward<Args>(args)...);
+        LuaObject* baseobj = static_cast<LuaObject*>(obj);
+        baseobj->buildMetatable(*this);
+        return obj;
+    }
 }
 
 #endif
