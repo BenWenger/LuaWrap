@@ -17,6 +17,9 @@
     <ClInclude Include="..\include\luawrap_config.h">
       <Filter>public</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\luaobject.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\luawrap.cpp">
