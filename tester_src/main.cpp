@@ -29,8 +29,19 @@ int callme(Lua& lua, int val)
     return 0;
 }
 
+class Butt
+{
+public:
+    int someFunc(Lua& lua)
+    {
+        cout << "In someFunc" <<  endl;
+        return 0;
+    }
+};
+
 int main()
 {
+    /*
     {
         Lua lua;
         lua.pushNewUserData<Temp>("Barfing");
@@ -40,6 +51,16 @@ int main()
 
         luaL_loadstring(lua, "callme(\"This is a test\")");
         lua_call(lua, 0, 0);
+    }
+    */
+    {
+        Butt b;
+        Lua lua;
+        lua.pushFunction(&b, &Butt::someFunc);
+        lua_call(lua,0,0);
+
+
+        cout << "\n\n";
     }
 
     char c;

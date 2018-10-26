@@ -2,14 +2,19 @@
 #include "luawrap.h"
 #include "luafunction.h"
 #include <stdexcept>
+#include <dshfs.h>
+#include <sstream>
 
 namespace luawrap
 {
-    Lua::Lua()
+    Lua::Lua(bool loadlibs)
     {
         L = luaL_newstate();
         if(!L)
             throw std::bad_alloc();
+
+        if(loadlibs)
+            luaL_openlibs(L);
     }
 
     Lua::Lua(Lua&& rhs)
@@ -34,6 +39,27 @@ namespace luawrap
         if(L)
             lua_close(L);
         L = nullptr;
+    }
+
+    //////////////////////////////////////////////////
+    
+    void Lua::loadFile(const std::string& filename)
+    {
+        dshfs::FileStream stream(filename);
+        loadFromStream(stream);
+    }
+
+    void Lua::loadFromStream(std::istream& stream)
+    {
+        std::stringstream sstr;
+        sstr << stream.rdbuf();
+        loadFromString(sstr.str().c_str());
+    }
+
+    void Lua::loadFromString(const char* str)
+    {
+        auto res = luaL_loadstring(L, str);
+        // TODO handle errors here
     }
 
     //////////////////////////////////////////////////
@@ -84,5 +110,12 @@ namespace luawrap
             luaL_error(L, e.what());
         }
         return 0;       // shouldn't reach here
+    }
+
+    
+    /////////////////////////////////////////
+    int Lua::callFunction(int args, int rets)
+    {
+        return 0;
     }
 }
