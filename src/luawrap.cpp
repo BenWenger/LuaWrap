@@ -44,45 +44,72 @@ namespace luawrap
 
     namespace
     {
-        struct Reader
+        struct StringReadDat
         {
-            dshfs::File::Ptr    f;
-            char                buffer[1024];
+            const char*         buffer;
+            size_t              size;
         };
-
-        const char * customLuaReaderFunc(lua_State* L, void* data, size_t* size)
+        const char* reader_String(lua_State* L, void* data, size_t* size)
         {
-            auto r = reinterpret_cast<Reader*>(data);
-            *size = static_cast<size_t>(r->f->read(r->buffer, 1024));
-            return r->buffer;
+            auto dat = reinterpret_cast<StringReadDat*>(data);
+            *size = dat->size;
+            return dat->buffer;
         }
 
-        void handleLoadResult(Lua& lua, int res)
+        struct StreamReadDat
         {
-            switch(res)
-            {
-            case LUA_OK:
-                break;
-            case LUA_ERRSYNTAX:
-                throw std::runtime_error("Lua Syntax Error:  " + lua.toString(-1,false));
-            case LUA_ERRMEM:
-                throw std::bad_alloc();
-            default:
-                throw std::runtime_error("Unknown Lua error occurred when trying to load");
-            }
+            std::istream*       stream;
+            char                buffer[1024];
+        };
+        const char* reader_Stream(lua_State* L, void* data, size_t* size)
+        {
+            auto dat = reinterpret_cast<StreamReadDat*>(data);
+            dat->stream->read(dat->buffer, 1024);
+            *size = static_cast<size_t>(dat->stream->gcount());
+            return dat->buffer;
+        }
+    }
+
+    void Lua::customLoad(readerFunc_t func, void* data, const char* chunkname)
+    {
+        auto res = lua_load(L, func, data, chunkname ? chunkname : "<unknown chunk>", nullptr);
+        switch(res)
+        {
+        case LUA_OK:
+            break;
+        case LUA_ERRSYNTAX:
+            throw std::runtime_error("Lua Syntax Error:  " + toString(-1,false));
+        case LUA_ERRMEM:
+            throw std::bad_alloc();
+        default:
+            throw std::runtime_error("Unknown Lua error occurred when trying to load");
         }
     }
     
-    void Lua::loadFile(const std::string& filename)
+    void Lua::loadFile(const std::string& filename, const char* debugname)
     {
-        Reader r;
-        r.f = std::move( dshfs::fs.openFile(filename, dshfs::FileMode::rt) );
-        handleLoadResult(*this, lua_load(L, &customLuaReaderFunc, reinterpret_cast<void*>(&r), filename.c_str(), nullptr));
+        dshfs::FileStream stream(filename);
+        loadStream(stream, debugname ? debugname : filename.c_str());
     }
-
-    void Lua::loadFromString(const char* str)
+    void Lua::loadStream(std::istream& strm, const char* debugname)
     {
-        handleLoadResult( *this, luaL_loadstring(L, str) );
+        StreamReadDat dat;
+        dat.stream = &strm;
+        customLoad( &reader_Stream, &dat, debugname );
+    }
+    void Lua::loadFromString(const std::string& str, const char* debugname)
+    {
+        StringReadDat dat;
+        dat.buffer = str.c_str();
+        dat.size = str.size();
+        customLoad( &reader_String, &dat, debugname );
+    }
+    void Lua::loadFromString(const char* str, const char* debugname)
+    {
+        StringReadDat dat;
+        dat.buffer = str;
+        dat.size = std::strlen(str);
+        customLoad( &reader_String, &dat, debugname );
     }
 
     //////////////////////////////////////////////////

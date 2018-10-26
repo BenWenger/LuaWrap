@@ -29,9 +29,10 @@ namespace luawrap
                                     Lua(const Lua&) = delete;
                     Lua&            operator = (const Lua&) = delete;
 
-        LUAWRAP_API void            loadFile(const std::string& filename);
-        LUAWRAP_API void            loadFromString(const std::string& str)  { loadFromString( str.c_str() );    }
-        LUAWRAP_API void            loadFromString(const char* str);
+        LUAWRAP_API void            loadFile(const std::string& filename, const char* debugname = nullptr);
+        LUAWRAP_API void            loadStream(std::istream& strm, const char* debugname = nullptr);
+        LUAWRAP_API void            loadFromString(const std::string& str, const char* debugname = nullptr);
+        LUAWRAP_API void            loadFromString(const char* str, const char* debugname = nullptr);
 
         inline      bool            isStackTraceEnabled() const             { return stackTraceOn;              }
         inline      void            enableStackTrace(bool en)               { stackTraceOn = en;                }
@@ -55,9 +56,12 @@ namespace luawrap
         void                pushFunction(T* obj, int (T::*func)(Lua&));
 
     private:
+        typedef const char* (*readerFunc_t)(lua_State*, void*, size_t*);
         lua_State*                  L;
         static int                  funcCallback(lua_State* L);
         bool                        stackTraceOn;
+
+        LUAWRAP_API void            customLoad(readerFunc_t func, void* data, const char* chunkname);
     };
 
 
