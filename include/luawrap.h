@@ -30,7 +30,6 @@ namespace luawrap
                     Lua&            operator = (const Lua&) = delete;
 
         LUAWRAP_API void            loadFile(const std::string& filename);
-        LUAWRAP_API void            loadFromStream(std::istream& stream);
         LUAWRAP_API void            loadFromString(const std::string& str)  { loadFromString( str.c_str() );    }
         LUAWRAP_API void            loadFromString(const char* str);
 

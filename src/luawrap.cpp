@@ -3,7 +3,6 @@
 #include "luafunction.h"
 #include <stdexcept>
 #include <dshfs.h>
-#include <sstream>
 
 namespace luawrap
 {
@@ -42,24 +41,48 @@ namespace luawrap
     }
 
     //////////////////////////////////////////////////
+
+    namespace
+    {
+        struct Reader
+        {
+            dshfs::File::Ptr    f;
+            char                buffer[1024];
+        };
+
+        const char * customLuaReaderFunc(lua_State* L, void* data, size_t* size)
+        {
+            auto r = reinterpret_cast<Reader*>(data);
+            *size = static_cast<size_t>(r->f->read(r->buffer, 1024));
+            return r->buffer;
+        }
+
+        void handleLoadResult(Lua& lua, int res)
+        {
+            switch(res)
+            {
+            case LUA_OK:
+                break;
+            case LUA_ERRSYNTAX:
+                throw std::runtime_error("Lua Syntax Error:  " + lua.toString(-1,false));
+            case LUA_ERRMEM:
+                throw std::bad_alloc();
+            default:
+                throw std::runtime_error("Unknown Lua error occurred when trying to load");
+            }
+        }
+    }
     
     void Lua::loadFile(const std::string& filename)
     {
-        dshfs::FileStream stream(filename);
-        loadFromStream(stream);
-    }
-
-    void Lua::loadFromStream(std::istream& stream)
-    {
-        std::stringstream sstr;
-        sstr << stream.rdbuf();
-        loadFromString(sstr.str().c_str());
+        Reader r;
+        r.f = std::move( dshfs::fs.openFile(filename, dshfs::FileMode::rt) );
+        handleLoadResult(*this, lua_load(L, &customLuaReaderFunc, reinterpret_cast<void*>(&r), filename.c_str(), nullptr));
     }
 
     void Lua::loadFromString(const char* str)
     {
-        auto res = luaL_loadstring(L, str);
-        // TODO handle errors here
+        handleLoadResult( *this, luaL_loadstring(L, str) );
     }
 
     //////////////////////////////////////////////////
@@ -73,7 +96,7 @@ namespace luawrap
     {
         LuaStackSaver stk(*this);
 
-        if(loopsafe)
+        if(loopsafe && (lua_type(L, idx) != LUA_TSTRING))
         {
             lua_pushvalue(L, idx);
             idx = -1;
@@ -116,6 +139,7 @@ namespace luawrap
     /////////////////////////////////////////
     int Lua::callFunction(int args, int rets)
     {
-        return 0;
+        // TODO add error handling for the stack trace and all that shiznit
+        return lua_pcall( L, args, rets, 0 );
     }
 }
