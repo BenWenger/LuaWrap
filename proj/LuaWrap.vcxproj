@@ -78,6 +78,7 @@
     <IncludePath>$(SolutionDir)..\include\;$(IncludePath)</IncludePath>
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)..\bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)..\include\;$(IncludePath)</IncludePath>
@@ -89,6 +90,7 @@
     <IncludePath>$(SolutionDir)..\include\;$(IncludePath)</IncludePath>
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)..\bin\$(ProjectName)\$(Configuration)_$(Platform)\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
