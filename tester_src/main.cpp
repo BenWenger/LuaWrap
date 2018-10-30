@@ -54,10 +54,20 @@ int main()
     }
     */
     {
-        Butt b;
+        const char* const luascript = "run = function() return 1, 2, 3 end";
+
         Lua lua;
-        lua.pushFunction(&b, &Butt::someFunc);
-        lua_call(lua,0,0);
+        luaL_loadstring(lua, luascript);
+        lua_pcall(lua,0,0,0);
+
+        lua_getglobal(lua, "run");
+        int res = lua_pcall(lua, 0, LUA_MULTRET,0);
+
+        int top = lua_gettop(lua);
+        int t1 = lua_type(lua, 1);
+        int t2 = lua_type(lua, 2);
+        int t3 = lua_type(lua, 3);
+
 
 
         cout << "\n\n";

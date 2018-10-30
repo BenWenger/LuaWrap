@@ -166,7 +166,16 @@ namespace luawrap
     /////////////////////////////////////////
     int Lua::callFunction(int args, int rets)
     {
-        // TODO add error handling for the stack trace and all that shiznit
-        return lua_pcall( L, args, rets, 0 );
+        if(rets < 0)        rets = LUA_MULTRET;
+
+        auto top = lua_gettop(L) - args - 1;
+        int err = lua_pcall( L, args, rets, 0 );        // TODO error handling and all that shiznit
+
+        if(err != LUA_OK)
+        {
+            // TODO do something better with this
+            throw std::runtime_error("Error in the Lua -- TODO I need to make a better message here");
+        }
+        return lua_gettop(L) - top;
     }
 }
