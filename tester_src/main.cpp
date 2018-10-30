@@ -39,38 +39,36 @@ public:
     }
 };
 
+int globalFunc(Lua& lua)
+{
+    throw std::runtime_error("Throwing an error");
+    return 0;
+}
+
+static const char* const errProgram = 
+"afunc = function() globalFunc() end\n"
+"bfunc = function() afunc() end\n"
+;
+
 int main()
 {
-    /*
     {
         Lua lua;
-        lua.pushNewUserData<Temp>("Barfing");
+        lua.enableStackTrace(true);
+        lua.pushFunction(&globalFunc);
+        lua_setglobal(lua, "globalFunc");
+        luaL_loadstring(lua, errProgram);
+        lua.callFunction(0,0);
 
-        lua.pushFunction( std::bind(&callme, std::placeholders::_1, 5) );
-        lua_setglobal(lua, "callme");
-
-        luaL_loadstring(lua, "callme(\"This is a test\")");
-        lua_call(lua, 0, 0);
-    }
-    */
-    {
-        const char* const luascript = "run = function() return 1, 2, 3 end";
-
-        Lua lua;
-        luaL_loadstring(lua, luascript);
-        lua_pcall(lua,0,0,0);
-
-        lua_getglobal(lua, "run");
-        int res = lua_pcall(lua, 0, LUA_MULTRET,0);
-
-        int top = lua_gettop(lua);
-        int t1 = lua_type(lua, 1);
-        int t2 = lua_type(lua, 2);
-        int t3 = lua_type(lua, 3);
-
-
-
-        cout << "\n\n";
+        try
+        {
+            lua_getglobal(lua, "bfunc");
+            lua.callFunction(0,0);
+        }
+        catch(std::exception& e)
+        {
+            std::cout << "Error received:  " << e.what() << std::endl;
+        }
     }
 
     char c;

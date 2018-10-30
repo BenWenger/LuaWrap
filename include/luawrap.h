@@ -62,6 +62,8 @@ namespace luawrap
         bool                        stackTraceOn;
 
         LUAWRAP_API void            customLoad(readerFunc_t func, void* data, const char* chunkname);
+        
+        static int                  luaErrHandler(lua_State* L);
     };
 
 

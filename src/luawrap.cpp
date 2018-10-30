@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <dshfs.h>
 
+#include <iostream>     // TODO remove this
+
 namespace luawrap
 {
     Lua::Lua(bool loadlibs)
@@ -162,20 +164,51 @@ namespace luawrap
         return 0;       // shouldn't reach here
     }
 
+    int Lua::luaErrHandler(lua_State* L)
+    {
+        Lua& lua = *reinterpret_cast<Lua*>( lua_touserdata(L, lua_upvalueindex(1)) );
+        auto msg = lua_gettop(lua);
+
+        LuaStackSaver stk(lua);
+
+        if(lua_getglobal(lua, "debug") != LUA_TTABLE)               return 1;
+        if(lua_getfield(lua, -1, "traceback") != LUA_TFUNCTION)     return 1;
+        lua_pushvalue(lua, msg);
+        lua_pushinteger(lua,2);
+        if(lua_pcall(lua, 2, 1, 0) != LUA_OK)                       return 1;
+
+        stk.detach();
+        return 1;
+    }
+
     
     /////////////////////////////////////////
     int Lua::callFunction(int args, int rets)
     {
-        if(rets < 0)        rets = LUA_MULTRET;
+        int zeroRetTop = lua_gettop(L) - args - 1;
+        if(zeroRetTop < 0)
+            throw std::invalid_argument("Lua::callFunction called with not enough arguments on the Lua stack");
 
-        auto top = lua_gettop(L) - args - 1;
-        int err = lua_pcall( L, args, rets, 0 );        // TODO error handling and all that shiznit
+        LuaStackSaver stk(*this, -args-1);
+        if(rets < 0)
+            rets = LUA_MULTRET;
+        
+        int hpos = 0;
+        if(stackTraceOn)
+        {
+            hpos = lua_gettop(L) - args;
+            lua_pushlightuserdata(L, reinterpret_cast<void*>(this));
+            lua_pushcclosure(L, &Lua::luaErrHandler, 1);
+            lua_insert(L, hpos);
+        }
+
+        int err = lua_pcall( L, args, rets, hpos );
 
         if(err != LUA_OK)
-        {
-            // TODO do something better with this
-            throw std::runtime_error("Error in the Lua -- TODO I need to make a better message here");
-        }
-        return lua_gettop(L) - top;
+            throw std::runtime_error(toString(-1,false));
+        if(stackTraceOn)
+            lua_remove( L, hpos );
+        stk.detach();
+        return lua_gettop(L) - zeroRetTop;
     }
 }
