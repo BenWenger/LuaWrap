@@ -1,7 +1,7 @@
 #ifndef LUAWRAP_H_INCLUDED
 #define LUAWRAP_H_INCLUDED
 
-#include "luawrap_config.h"
+#include "luawrap/luawrap_config.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -12,8 +12,8 @@
 #include <type_traits>
 #include <functional>
 
-#include "luaobject.h"
-#include "luastacksaver.h"
+#include "luawrap/luaobject.h"
+#include "luawrap/luastacksaver.h"
 
 namespace luawrap
 {

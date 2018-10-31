@@ -9,22 +9,25 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="public\luawrap">
+      <UniqueIdentifier>{e09e6683-a490-4f65-a884-52b4cb7c6c38}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\luawrap.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\luawrap_config.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\luaobject.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\luafunction.h">
       <Filter>private</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\luastacksaver.h">
-      <Filter>public</Filter>
+    <ClInclude Include="..\include\luawrap\luaobject.h">
+      <Filter>public\luawrap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\luawrap\luastacksaver.h">
+      <Filter>public\luawrap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\luawrap\luawrap_config.h">
+      <Filter>public\luawrap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

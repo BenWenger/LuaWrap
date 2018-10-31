@@ -145,10 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\luaobject.h" />
-    <ClInclude Include="..\include\luastacksaver.h" />
     <ClInclude Include="..\include\luawrap.h" />
-    <ClInclude Include="..\include\luawrap_config.h" />
+    <ClInclude Include="..\include\luawrap\luaobject.h" />
+    <ClInclude Include="..\include\luawrap\luastacksaver.h" />
+    <ClInclude Include="..\include\luawrap\luawrap_config.h" />
     <ClInclude Include="..\src\luafunction.h" />
   </ItemGroup>
   <ItemGroup>
