@@ -1,6 +1,6 @@
 
 #include "luawrap.h"
-#include "luastacksaver.h"
+#include "luawrap/luastacksaver.h"
 
 namespace luawrap
 {

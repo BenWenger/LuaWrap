@@ -1,6 +1,6 @@
 
 #include "luawrap.h"
-#include "luaobject.h"
+#include "luawrap/luaobject.h"
 
 namespace luawrap
 {
