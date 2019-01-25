@@ -49,6 +49,8 @@ namespace luawrap
         template <typename UserType, typename... Args>
         UserType*           pushNewUserData(Args&&... args);
 
+        LUAWRAP_API void            pushLightUserData(LuaObject* obj);
+
         template <typename UserType>
         UserType*           toUserData(int idx, const char* failMessage = nullptr);
 
@@ -80,7 +82,7 @@ namespace luawrap
 
         UserType* obj = new(buffer) UserType(std::forward<Args>(args)...);
         LuaObject* baseobj = static_cast<LuaObject*>(obj);
-        baseobj->buildMetatable(*this);
+        baseobj->initialize(*this, true);
         return obj;
     }
 

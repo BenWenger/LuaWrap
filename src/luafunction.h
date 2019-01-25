@@ -18,7 +18,6 @@ namespace luawrap
         {
             return func(lua);
         }
-
     private:
         func_t      func;
     };

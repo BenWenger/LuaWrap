@@ -133,7 +133,7 @@ namespace luawrap
 
         size_t len;
         const char* s = lua_tolstring(L, idx, &len);
-        return std::string(s, len);
+        return s ? std::string(s, len) : "";
     }
 
     /////////////////////////////////////////
@@ -142,6 +142,13 @@ namespace luawrap
         lua_pushlightuserdata(L, this);
         pushNewUserData<LuaFunction>(func);
         lua_pushcclosure(L, &Lua::funcCallback, 2);
+    }
+
+    /////////////////////////////////////////
+    void Lua::pushLightUserData(LuaObject* obj)
+    {
+        obj->initialize(*this, false);
+        lua_pushlightuserdata(L, reinterpret_cast<void*>(obj));
     }
 
     int Lua::funcCallback(lua_State* L)
