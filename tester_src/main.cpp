@@ -43,7 +43,7 @@ class SomeObj : public LuaObject
 {
 public:
 
-protected:
+protected:/*
     int indexHandler(Lua& lua) override
     {
         if(lua.toString(-1) == "test")
@@ -51,7 +51,7 @@ protected:
         else
             lua_pushnil(lua);
         return 1;
-    }
+    }*/
 
 private:
     int test(Lua& lua)

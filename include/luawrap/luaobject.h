@@ -15,8 +15,7 @@ namespace luawrap
         LUAWRAP_API virtual         ~LuaObject();
 
     protected:
-        virtual void                addMetaMethods(Lua& lua)        {};
-        virtual int                 indexHandler(Lua& lua)          { return 0;     }
+        virtual void                addLuaMetaMethods(Lua& lua)     {}
 
 
     private:
@@ -24,6 +23,7 @@ namespace luawrap
         LUAWRAP_API void            initialize(Lua& lua, bool needGC);
         static int                  gcHandler(lua_State* L);
         static int                  rawIndexHandler(lua_State* L);
+        static int                  rawNewIndexHandler(lua_State* L);
         Lua*                        hostLuaObj;
     };
 }

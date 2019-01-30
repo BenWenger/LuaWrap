@@ -147,8 +147,8 @@ namespace luawrap
     /////////////////////////////////////////
     void Lua::pushLightUserData(LuaObject* obj)
     {
-        obj->initialize(*this, false);
         lua_pushlightuserdata(L, reinterpret_cast<void*>(obj));
+        obj->initialize(*this, false);
     }
 
     int Lua::funcCallback(lua_State* L)
